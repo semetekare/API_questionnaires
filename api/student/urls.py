@@ -14,4 +14,5 @@ router.register(r'studentsGroupsSubjects', StudentsGroupsSubjectsViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    #path('create_subject/', SubjectViewSet.as_view({'post': 'create'}), name='subject-create'),
 ]
