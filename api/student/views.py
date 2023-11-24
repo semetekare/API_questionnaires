@@ -1,10 +1,13 @@
+from django.db.models.query import QuerySet
+
 from rest_framework import mixins
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from student.models import Subject, Student, StudentsGroup, StudentsGroupsSubjects, StudentsGroupsStudents
-from student.serializers import SubjectSerializer, StudentSerializer, StudentsGroupSerializer, StudentsGroupsSubjectsSerializer, StudentsGroupsStudentsSerializer
+from student.serializers import SubjectSerializer, StudentSerializer, StudentsGroupSerializer, StudentsGroupsSubjectsSerializer, \
+    StudentsGroupsStudentsSerializer, GetStudentsByStudentsGroupIdSerializer
 from user.models import University
 
 
@@ -79,21 +82,27 @@ class StudentsGroupsStudentsViewSet(mixins.CreateModelMixin,
     queryset = StudentsGroupsStudents.objects.all()
     serializer_class = StudentsGroupsStudentsSerializer
 
-    # @api_view(['GET'])
-    # def get_students_by_group_id(request, students_group_id):
-    #     try:
-    #         # Находим всех студентов по students_group_id
-    #         students_group_students = StudentsGroupsStudents.objects.filter(students_group_id=students_group_id)
-    #
-    #         # Получаем идентификаторы студентов
-    #         student_ids = students_group_students.values_list('student_id', flat=True)
-    #
-    #         # Получаем информацию о студентах по найденным идентификаторам
-    #         students = Student.objects.filter(id__in=student_ids)
-    #
-    #         # Сериализуем полученных студентов
-    #         serializer = StudentSerializer(students, many=True)
-    #
-    #         return Response(serializer.data)
-    #     except Exception as e:
-    #         return Response({'error': str(e)}, status=500)
+
+class GetStudentsByStudentsGroupIdViewSet(mixins.ListModelMixin, GenericViewSet):
+    queryset = StudentsGroupsStudents.objects.all()
+    serializer_class = GetStudentsByStudentsGroupIdSerializer
+
+    lookup_field = 'students_group'
+    lookup_url_kwarg = 'pk'
+
+    def list(self, request, pk=None, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset(pk=pk))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def get_queryset(self, pk=None):
+        queryset = self.queryset
+        if isinstance(queryset, QuerySet):
+            queryset = queryset.filter(students_group__pk=pk)
+        return queryset

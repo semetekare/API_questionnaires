@@ -32,4 +32,9 @@ class StudentsGroupsStudentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentsGroupsStudents
         fields = '__all__'
-    
+
+class GetStudentsByStudentsGroupIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentsGroupsStudents
+        fields = ['student']
+        depth = 1
