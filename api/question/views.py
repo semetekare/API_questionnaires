@@ -105,6 +105,18 @@ class AnswerViewSet(mixins.CreateModelMixin,
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
 
+    def list(self, request):
+        question_ids_param = request.query_params.get('question_id')  # Получаем параметр question_id из запроса
+        question_ids = question_ids_param.split(',') if ',' in question_ids_param else [question_ids_param]
+
+        all_answers = {}
+        for question_id in question_ids:
+            answers = Answer.objects.filter(question_id=question_id)
+            serialized_answers = self.serializer_class(answers, many=True).data
+            all_answers[question_id] = serialized_answers
+
+        return Response(all_answers)
+
 
 class GetAnswerByQuestionIdViewSet(mixins.ListModelMixin, GenericViewSet):
     queryset = Answer.objects.all()
