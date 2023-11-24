@@ -7,7 +7,7 @@ class Test(models.Model):
     class Type(models.TextChoices):
         IMMEDIATELY = 1, _('сразу после прохождения теста')
         AFTER_PERMISSION = 2, _('после разрешения от препода')
-        
+
     questions_base = models.ForeignKey('question.QuestionsBase', on_delete=models.DO_NOTHING, null=False, blank=False)
     is_actual = models.BooleanField(default=True, null=False, blank=False)
     finish_actual = models.IntegerField(default=None)
@@ -30,7 +30,7 @@ class TestsQuestionsGroups(models.Model):
 class QuestionsBase(models.Model):
     subject = models.ForeignKey('student.Subject', on_delete=models.DO_NOTHING, null=False, blank=False)
     title = models.CharField(max_length=128, null=False, blank=False)
-    
+
 
 class QuestionsGroup(models.Model):
     questions_base = models.ForeignKey('question.QuestionsBase', on_delete=models.DO_NOTHING, null=False, blank=False)

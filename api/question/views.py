@@ -1,3 +1,5 @@
+from django.db.models.query import QuerySet
+
 from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -102,3 +104,28 @@ class AnswerViewSet(mixins.CreateModelMixin,
                         GenericViewSet):
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
+
+
+class GetAnswerByQuestionIdViewSet(mixins.ListModelMixin, GenericViewSet):
+    queryset = Answer.objects.all()
+    serializer_class = AnswerSerializer
+
+    lookup_field = 'question'
+    lookup_url_kwarg = 'pk'
+
+    def list(self, request, pk=None, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset(pk=pk))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def get_queryset(self, pk=None):
+        queryset = self.queryset
+        if isinstance(queryset, QuerySet):
+            queryset = queryset.filter(question__pk=pk)
+        return queryset
