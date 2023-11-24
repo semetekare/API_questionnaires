@@ -129,3 +129,42 @@ class GetAnswerByQuestionIdViewSet(mixins.ListModelMixin, GenericViewSet):
         if isinstance(queryset, QuerySet):
             queryset = queryset.filter(question__pk=pk)
         return queryset
+
+class GetAnswerByQuestionIdViewSet(mixins.ListModelMixin, GenericViewSet):
+    serializer_class = QuestionsGroupSerializer
+
+    def list(self, request, *args, **kwargs):
+        questions_base_id = self.kwargs.get('pk')
+        response_mode = request.query_params.get('mode')
+
+        questions_base = QuestionsBase.objects.get(id=questions_base_id)
+
+        questions_base_serializer = QuestionsBaseSerializer(questions_base).data
+
+        if response_mode == '0':
+            return Response({'questions_base': questions_base_serializer})
+        else:
+            # Получаем все QuestionsGroup, принадлежащие QuestionsBase
+            questions_groups = QuestionsGroup.objects.filter(questions_base=questions_base)
+            serialized_data = []
+
+            # Перебираем каждый QuestionsGroup и добавляем вложенные question и answers
+            for group in questions_groups:
+                serialized_group = self.get_serializer(group).data
+                questions = Question.objects.filter(questions_group=group)
+                serialized_questions = QuestionSerializer(questions, many=True).data
+
+                # Добавляем в каждый вопрос все связанные ответы
+                for question_data in serialized_questions:
+                    answers = Answer.objects.filter(question=question_data['id'])
+                    question_data['answers'] = AnswerSerializer(answers, many=True).data
+
+                serialized_group['questions'] = serialized_questions
+                serialized_data.append(serialized_group)
+
+            response_data = {
+                'questions_base': questions_base_serializer,
+                'questions_groups': serialized_data,
+            }
+
+            return Response(response_data)

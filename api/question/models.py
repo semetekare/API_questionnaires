@@ -47,7 +47,7 @@ class Question(models.Model):
     formulation = models.TextField(null=False, blank=False)
     type = models.IntegerField(choices=Type.choices, null=False, blank=False)
     ok_comment = models.CharField(max_length=128, default=None)
-    bad_commnet = models.CharField(max_length=128, default=None)
+    bad_commnet = models.CharField(max_length=128, default=None, blank=True)
     shuffle_answers = models.BooleanField(default=False)
     cost = models.FloatField(default=0.1, null=False, blank=False)
 

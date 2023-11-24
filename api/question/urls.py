@@ -16,5 +16,5 @@ router.register(r'testsQuestionsGroups', TestsQuestionsGroupsViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('answer/question/<int:pk>/', GetAnswerByQuestionIdViewSet.as_view({'get': 'list'}))
+    path('questionsbase/<int:pk>/', GetAnswerByQuestionIdViewSet.as_view({'get': 'list'}))
 ]
