@@ -15,6 +15,8 @@ class StatisticViewSet(mixins.CreateModelMixin,
     queryset = Statistic.objects.all()
     serializer_class = StatisticSerializer
 
+    filterset_fields = '__all__'
+
 
 class StatisticsAnswersViewSet(mixins.CreateModelMixin,
                         mixins.ListModelMixin,
@@ -24,3 +26,5 @@ class StatisticsAnswersViewSet(mixins.CreateModelMixin,
                         GenericViewSet):
     queryset = StatisticsAnswers.objects.all()
     serializer_class = StatisticsAnswersSerializer
+
+    filterset_fields = ['statistic__test__id', 'statistic__student__id']
