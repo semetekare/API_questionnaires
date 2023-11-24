@@ -142,7 +142,7 @@ class GetAnswerByQuestionIdViewSet(mixins.ListModelMixin, GenericViewSet):
             queryset = queryset.filter(question__pk=pk)
         return queryset
 
-class GetAnswerByQuestionIdViewSet(mixins.ListModelMixin, GenericViewSet):
+class GetAnswerByQuestionsIdViewSet(mixins.ListModelMixin, GenericViewSet):
     serializer_class = QuestionsGroupSerializer
 
     def list(self, request, *args, **kwargs):

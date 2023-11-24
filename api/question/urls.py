@@ -2,9 +2,9 @@ from django.urls import path, include
 
 from rest_framework import routers
 
-from question.views import TestViewSet, AnswerViewSet, QuestionViewSet, QuestionsBaseViewSet, QuestionsGroupViewSet, TestsQuestionsGroupsViewSet, \
-    GetAnswerByQuestionIdViewSet
-
+from question.views import TestViewSet, AnswerViewSet, QuestionViewSet, QuestionsBaseViewSet, QuestionsGroupViewSet, \
+    TestsQuestionsGroupsViewSet, \
+    GetAnswerByQuestionIdViewSet, GetAnswerByQuestionsIdViewSet
 
 router = routers.SimpleRouter()
 router.register(r'test', TestViewSet)
@@ -16,5 +16,5 @@ router.register(r'testsQuestionsGroups', TestsQuestionsGroupsViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('questionsbase/<int:pk>/', GetAnswerByQuestionIdViewSet.as_view({'get': 'list'}))
+    path('questionsbase/<int:pk>/', GetAnswerByQuestionsIdViewSet.as_view({'get': 'list'}))
 ]
