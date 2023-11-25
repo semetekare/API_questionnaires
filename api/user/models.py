@@ -10,9 +10,9 @@ class CustomUser(models.Model):
         ADMIN = 2, _('Админ')
         TEACHER = 3, _('Преподаватель')
 
-    login = models.CharField(max_length=128, null=False, blank=False)
-    password = models.TextField(null=False, blank=False)
-    role = models.CharField(max_length=1, choices=Type.choices, null=False, blank=False)
+    login = models.CharField(max_length=128, null=False, blank=False, verbose_name='Логин')
+    password = models.TextField(null=False, blank=False, verbose_name='Пароль')
+    role = models.CharField(max_length=1, choices=Type.choices, null=False, blank=False, verbose_name='Роль')
 
     def __str__(self) -> str:
         return f"{self.login}: {self.get_role_display()}"
@@ -23,15 +23,15 @@ class CustomUser(models.Model):
 
 
 class Teacher(models.Model):
-    university = models.ForeignKey('user.University', on_delete=models.DO_NOTHING, null=False, blank=False)
-    user = models.ForeignKey('user.CustomUser', on_delete=models.DO_NOTHING, null=False, blank=False)
-    first_name = models.CharField(max_length=128, null=False, blank=False)
-    last_name = models.CharField(max_length=128, null=False, blank=False)
-    middle_name = models.CharField(max_length=128, null=False, blank=False)
-    description = models.TextField(default=None)
-    mail = models.CharField(max_length=128, null=False, blank=False)
-    phone = models.CharField(max_length=10, default=None)
-    tg_username = models.CharField(max_length=64, default=None)
+    university = models.ForeignKey('user.University', on_delete=models.DO_NOTHING, null=False, blank=False, verbose_name='Университет')
+    user = models.ForeignKey('user.CustomUser', on_delete=models.DO_NOTHING, null=False, blank=False, verbose_name='Пользователь')
+    first_name = models.CharField(max_length=128, null=False, blank=False, verbose_name='Имя')
+    last_name = models.CharField(max_length=128, null=False, blank=False, verbose_name='Фамилия')
+    middle_name = models.CharField(max_length=128, null=False, blank=False, verbose_name='Отчетсво')
+    description = models.TextField(default=None, verbose_name='Описание')
+    mail = models.CharField(max_length=128, null=False, blank=False, verbose_name='Почта')
+    phone = models.CharField(max_length=10, default=None, verbose_name='Номер телефона')
+    tg_username = models.CharField(max_length=64, default=None, verbose_name='tg аккаунт')
 
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}: {self.university}"
@@ -42,11 +42,11 @@ class Teacher(models.Model):
 
 
 class Admin(models.Model):
-    user = models.ForeignKey('user.CustomUser', on_delete=models.DO_NOTHING, null=False, blank=False)
-    university = models.ForeignKey('user.University', on_delete=models.DO_NOTHING, null=False, blank=False)
-    first_name = models.CharField(max_length=128, null=False, blank=False)
-    last_name = models.CharField(max_length=128, null=False, blank=False)
-    middle_name = models.CharField(max_length=128, null=False, blank=False)
+    user = models.ForeignKey('user.CustomUser', on_delete=models.DO_NOTHING, null=False, blank=False, verbose_name='Пользователь')
+    university = models.ForeignKey('user.University', on_delete=models.DO_NOTHING, null=False, blank=False, verbose_name='Университет')
+    first_name = models.CharField(max_length=128, null=False, blank=False, verbose_name='Имя')
+    last_name = models.CharField(max_length=128, null=False, blank=False, verbose_name='Фамилия')
+    middle_name = models.CharField(max_length=128, null=False, blank=False, verbose_name='Отчество')
 
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}: {self.university}"
@@ -57,7 +57,7 @@ class Admin(models.Model):
 
 
 class University(models.Model):
-    name = models.CharField(max_length=255, null=False, blank=False)
+    name = models.CharField(max_length=255, null=False, blank=False, verbose_name='Название университета')
 
     def __str__(self) -> str:
         return self.name
