@@ -12,7 +12,7 @@ class CustomUser(models.Model):
 
     login = models.CharField(max_length=128, null=False, blank=False)
     password = models.TextField(null=False, blank=False)
-    role = models.CharField(max_length=255, choices=Type.choices, null=False, blank=False)
+    role = models.CharField(max_length=1, choices=Type.choices, null=False, blank=False)
 
 
 class Teacher(models.Model):

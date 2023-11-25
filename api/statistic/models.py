@@ -13,7 +13,7 @@ class Statistic(models.Model):
     student = models.ForeignKey('student.Student', on_delete=models.DO_NOTHING, null=False, blank=False)
     question = models.ForeignKey('question.Question', on_delete=models.DO_NOTHING, null=False, blank=False)
     needed_time = models.IntegerField(null=False, blank=False)
-    type = models.IntegerField(choices=Type.choices, null=False, blank=False)
+    type = models.CharField(max_length=1, choices=Type.choices, null=False, blank=False)
 
 
 class StatisticsAnswers(models.Model):

@@ -12,8 +12,6 @@ class StatisticSerializer(serializers.ModelSerializer):
 
 
 class StatisticsAnswersSerializer(serializers.ModelSerializer):
-    answer = AnswerSerializer(source='question.id')
-
     class Meta:
         model = StatisticsAnswers
         fields = '__all__'

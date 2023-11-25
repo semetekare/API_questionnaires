@@ -17,7 +17,7 @@ class Test(models.Model):
     total_questions_quantity = models.IntegerField(null=False, blank=False)
     allow_pass_return = models.BooleanField(default=True, null=False, blank=False)
     warn = models.BooleanField(default=True, null=False, blank=False)
-    when_to_show_statistic = models.IntegerField(choices=Type.choices)
+    when_to_show_statistic = models.CharField(max_length=1, choices=Type.choices)
     send_statistic = models.BooleanField(default=True, null=False, blank=False)
 
 
@@ -45,9 +45,9 @@ class Question(models.Model):
 
     questions_group = models.ForeignKey('question.QuestionsGroup', on_delete=models.DO_NOTHING, null=False, blank=False)
     formulation = models.TextField(null=False, blank=False)
-    type = models.IntegerField(choices=Type.choices, null=False, blank=False)
+    type = models.CharField(max_length=1, choices=Type.choices, null=False, blank=False)
     ok_comment = models.CharField(max_length=128, default=None)
-    bad_commnet = models.CharField(max_length=128, default=None, blank=True)
+    bad_comment = models.CharField(max_length=128, default=None, blank=True)
     shuffle_answers = models.BooleanField(default=False)
     cost = models.FloatField(default=0.1, null=False, blank=False)
 
