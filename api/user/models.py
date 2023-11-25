@@ -14,6 +14,13 @@ class CustomUser(models.Model):
     password = models.TextField(null=False, blank=False)
     role = models.CharField(max_length=1, choices=Type.choices, null=False, blank=False)
 
+    def __str__(self) -> str:
+        return f"{self.login}: {self.get_role_display()}"
+
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural= 'Пользователи'
+
 
 class Teacher(models.Model):
     university = models.ForeignKey('user.University', on_delete=models.DO_NOTHING, null=False, blank=False)
@@ -26,6 +33,13 @@ class Teacher(models.Model):
     phone = models.CharField(max_length=10, default=None)
     tg_username = models.CharField(max_length=64, default=None)
 
+    def __str__(self) -> str:
+        return f"{self.first_name} {self.last_name}: {self.university}"
+
+    class Meta:
+        verbose_name = 'Преподаватель'
+        verbose_name_plural= 'Преподаватели'
+
 
 class Admin(models.Model):
     user = models.ForeignKey('user.CustomUser', on_delete=models.DO_NOTHING, null=False, blank=False)
@@ -34,6 +48,20 @@ class Admin(models.Model):
     last_name = models.CharField(max_length=128, null=False, blank=False)
     middle_name = models.CharField(max_length=128, null=False, blank=False)
 
+    def __str__(self) -> str:
+        return f"{self.first_name} {self.last_name}: {self.university}"
+
+    class Meta:
+        verbose_name = 'Админ'
+        verbose_name_plural= 'Админы'
+
 
 class University(models.Model):
     name = models.CharField(max_length=255, null=False, blank=False)
+
+    def __str__(self) -> str:
+        return self.name
+
+    class Meta:
+        verbose_name = 'Университет'
+        verbose_name_plural= 'Университеты'

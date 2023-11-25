@@ -20,6 +20,13 @@ class Test(models.Model):
     when_to_show_statistic = models.CharField(max_length=1, choices=Type.choices)
     send_statistic = models.BooleanField(default=True, null=False, blank=False)
 
+    def __str__(self) -> str:
+        return f"{self.title}: {self.is_actual}; {self.questions_base}"
+
+    class Meta:
+        verbose_name = 'Тест'
+        verbose_name_plural= 'Тесты'
+
 
 class TestsQuestionsGroups(models.Model):
     test = models.ForeignKey('question.Test', on_delete=models.DO_NOTHING, null=False, blank=False)
@@ -31,10 +38,24 @@ class QuestionsBase(models.Model):
     subject = models.ForeignKey('student.Subject', on_delete=models.DO_NOTHING, null=False, blank=False)
     title = models.CharField(max_length=128, null=False, blank=False)
 
+    def __str__(self) -> str:
+        return f"{self.title}; {self.subject}"
+
+    class Meta:
+        verbose_name = 'База вопросов'
+        verbose_name_plural= 'Базы вопросов'
+
 
 class QuestionsGroup(models.Model):
     questions_base = models.ForeignKey('question.QuestionsBase', on_delete=models.DO_NOTHING, null=False, blank=False)
     title = models.CharField(max_length=128, null=False, blank=False)
+
+    def __str__(self) -> str:
+        return f"{self.title}; {self.questions_base}"
+
+    class Meta:
+        verbose_name = 'Группа вопросов'
+        verbose_name_plural= 'Группы вопросов'
 
 
 class Question(models.Model):
@@ -51,9 +72,23 @@ class Question(models.Model):
     shuffle_answers = models.BooleanField(default=False)
     cost = models.FloatField(default=0.1, null=False, blank=False)
 
+    def __str__(self) -> str:
+        return f"{self.formulation}: {self.type}; {self.questions_group}"
+
+    class Meta:
+        verbose_name = 'База вопросов'
+        verbose_name_plural= 'Базы вопросов'
+
 
 class Answer(models.Model):
     question = models.ForeignKey('question.Question', on_delete=models.DO_NOTHING, null=False, blank=False)
     text = models.TextField(null=False, blank=False)
     is_correct = models.BooleanField(null=False, blank=False)
+
+    def __str__(self) -> str:
+        return f"{self.text}: {self.is_correct}; {self.question}"
+
+    class Meta:
+        verbose_name = 'Ответ'
+        verbose_name_plural= 'Ответы'
 

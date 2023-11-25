@@ -15,6 +15,13 @@ class Statistic(models.Model):
     needed_time = models.IntegerField(null=False, blank=False)
     type = models.CharField(max_length=1, choices=Type.choices, null=False, blank=False)
 
+    def __str__(self) -> str:
+        return f"{self.test}; {self.student}; {self.question}; {self.type}"
+
+    class Meta:
+        verbose_name = 'Статистика'
+        verbose_name_plural= 'Статистики'
+
 
 class StatisticsAnswers(models.Model):
     statistic = models.ForeignKey('statistic.Statistic', on_delete=models.DO_NOTHING, null=False, blank=False)
