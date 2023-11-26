@@ -24,8 +24,8 @@ class Registration(StatesGroup):
     group = State()
 
 
-TOKEN = '6830518143:AAG6cxJYJQTxkzXeNQvRpYfLfVZEcR4qwwo'
-BOT_URL = 'https://t.me/hackaton_zone_test_bot'
+TOKEN = 'TOKEN'
+BOT_URL = 'BOT_URL'
 router = Router()
 
 TEST_URL = 'http://localhost:8000'
