@@ -19,7 +19,7 @@ class Student(models.Model):
     first_name = models.CharField(max_length=128, null=False, blank=False, verbose_name='Имя')
     last_name = models.CharField(max_length=128, null=False, blank=False, verbose_name='Фамилия')
     middle_name = models.CharField(max_length=128, null=False, blank=False, verbose_name='Отчество')
-    university = models.ForeignKey('user.University', on_delete=models.DO_NOTHING, null=False, blank=False, verbose_name='Университет')
+    university = models.ForeignKey('user.University', on_delete=models.DO_NOTHING, verbose_name='Университет')
     group = models.CharField(max_length=128, null=False, blank=False, verbose_name='Группа')
     tg_username = models.CharField(max_length=64, null=False, blank=False, verbose_name='tg аккаунт')
 

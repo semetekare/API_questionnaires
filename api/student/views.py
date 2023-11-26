@@ -7,7 +7,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from student.models import Subject, Student, StudentsGroup, StudentsGroupsSubjects, StudentsGroupsStudents
 from student.serializers import SubjectSerializer, StudentSerializer, StudentsGroupSerializer, StudentsGroupsSubjectsSerializer, \
-    StudentsGroupsStudentsSerializer, GetStudentsByStudentsGroupIdSerializer
+    StudentsGroupsStudentsSerializer, GetStudentsByStudentsGroupIdSerializer, CheckStudentSerializer
 from user.models import University
 
 
@@ -40,7 +40,7 @@ class StudentViewSet(mixins.CreateModelMixin,
 
 class CheckStudentViewSet(mixins.RetrieveModelMixin, GenericViewSet):
     queryset = Student.objects.all()
-    serializer_class = StudentSerializer
+    serializer_class = CheckStudentSerializer
 
     lookup_field = 'tg_username'
 
