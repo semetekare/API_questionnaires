@@ -1,0 +1,40 @@
+version: "3.6"
+
+services:
+  api:
+    build:
+      context: api
+      dockerfile: .docker/Dockerfile
+    command: /app/dev.sh
+    restart: unless-stopped
+    volumes:
+      - /media_volume_test:/app/media
+      - /static_volume_test:/app/static
+    expose:
+      - 8000
+    networks:
+      - test_api
+
+  nginx:
+    build:
+      context: ./
+      dockerfile: nginx/Dockerfile
+    volumes:
+      - /media_volume_test:/media
+      - /static_volume_test:/static
+    ports:
+      - "8000:80"
+    links:
+      - api
+    depends_on:
+      - api
+    networks:
+      - test_api
+
+networks:
+  test_api:
+    driver: bridge
+
+volumes:
+  media_volume_test:
+  static_volume_test:
