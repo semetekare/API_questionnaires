@@ -5,11 +5,11 @@ services:
     build:
       context: api
       dockerfile: .docker/Dockerfile
-    command: /app/dev.sh
+    command: /api/dev.sh
     restart: unless-stopped
     volumes:
-      - /media_volume_test:/app/media
-      - /static_volume_test:/app/static
+      - /media_volume_test:/api/media
+      - /static_volume_test:/api/static
     expose:
       - 8000
     networks:

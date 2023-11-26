@@ -2,7 +2,7 @@
 FROM python:3.11.6-alpine3.18
 
 # Устанавливаем рабочую директорию внутри контейнера
-WORKDIR /app
+WORKDIR /api
 
 # Устанавливаем переменные окружения для Python
 ENV PYTHONDONTWRITEBYTECODE=1 \
