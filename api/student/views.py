@@ -38,6 +38,12 @@ class StudentViewSet(mixins.CreateModelMixin,
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
 
+class CheckStudentViewSet(mixins.RetrieveModelMixin, GenericViewSet):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+
+    lookup_field = 'tg_username'
+
 
 class StudentsGroupViewSet(mixins.CreateModelMixin,
                         mixins.ListModelMixin,
