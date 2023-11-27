@@ -1,0 +1,26 @@
+stages:
+  - build
+  - deploy
+
+default:
+  tags:
+    - deploy
+    - master
+
+workflow:
+  rules:
+   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+build-job:
+  stage: build
+  script:
+    - docker -v # Выводим версию Docker для отладки
+    - docker compose version # Выводим версию Docker Compose для отладки
+    - docker compose down --remove-orphans
+    - docker compose build --build-arg COMMIT_TAG=$CI_COMMIT_SHORT_SHA # Добавляем тег коммита к сборке
+
+deploy-job:
+  stage: deploy
+  script:
+    - docker compose up -d
+    - docker image prune -af
