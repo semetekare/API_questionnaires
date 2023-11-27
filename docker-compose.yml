@@ -7,9 +7,17 @@ services:
       dockerfile: .docker/Dockerfile
     command: /api/dev.sh
     restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
     volumes:
-      - /media_volume_test:/api/media
-      - /static_volume_test:/api/static
+      - media_volume_test:/api/media
+      - static_volume_test:/api/static
     expose:
       - 8000
     networks:
@@ -20,8 +28,8 @@ services:
       context: ./
       dockerfile: nginx/Dockerfile
     volumes:
-      - /media_volume_test:/media
-      - /static_volume_test:/static
+      - media_volume_test:/media
+      - static_volume_test:/static
     ports:
       - "8000:80"
     links:
@@ -31,10 +39,22 @@ services:
     networks:
       - test_api
 
+  postgres:
+    image: postgres:12.17-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    networks:
+      - test_api
+
 networks:
   test_api:
     driver: bridge
 
 volumes:
+  postgres_volume:
   media_volume_test:
   static_volume_test:
