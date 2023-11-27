@@ -18,6 +18,6 @@ RUN pip install -r requirements.txt
 
 # Копируем остальной код приложения в текущую директорию в контейнере
 COPY . .
-
+RUN chmod +x dev.sh
 # Копируем скрипт dev.sh в текущую директорию в контейнере
 COPY script/dev.sh .
