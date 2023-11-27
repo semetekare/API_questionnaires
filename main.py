@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import re
 import sys
 import json
 import requests
@@ -7,12 +8,12 @@ import requests
 from aiogram import Bot, F, Dispatcher, Router, types, filters, html
 from aiogram.enums import ParseMode
 from aiogram.types import Message, ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton
-from aiogram.filters import CommandStart, Command, Text
+from aiogram.filters import CommandStart, Command, Text, CommandObject
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
-
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.utils.deep_linking import decode_payload, create_start_link
 
 
 class Registration(StatesGroup):
@@ -26,21 +27,8 @@ class Registration(StatesGroup):
 
 TOKEN = 'TOKEN'
 BOT_URL = 'BOT_URL'
+SERVER_URL = 'SERVER_URL'
 router = Router()
-
-TEST_URL = 'http://localhost:8000'
-
-'''response = requests.get(f'{TEST_URL}/university')
-#  print(response.encoding)
-if response:
-    print(f'Код {response.status_code}: {response.reason}')
-    for univ in response.json()['results']:
-        print(f'{univ["id"]}. {univ["name"]}')
-    #  print(response.json())
-else:
-    print(f'Ошибка {response.status_code}: {response.reason}')
-    print(response.text)
-'''
 
 
 def get_reg_keyboard():
@@ -51,9 +39,16 @@ def get_reg_keyboard():
     return keyboardYesNo.as_markup()
 
 
+@router.message(CommandStart(deep_link=True, magic=F.args.regexp(re.compile(r'test_(\d+)'))))
+async def test_args(msg: Message, cmd: CommandObject):
+    test_number = cmd.args.split("_")[1]
+    print(decode_payload(cmd.args))
+    await msg.answer(f"Payload: {test_number}")
+
+
 @router.message(CommandStart())
-async def cmd_start(msg: Message, state: FSMContext):
-    response = requests.get(f'{TEST_URL}/checkStudent/{msg.from_user.username}')
+async def check_start(msg: Message, state: FSMContext):
+    response = requests.get(f'{SERVER_URL}/checkStudent/{msg.from_user.username}')
     await state.set_state(Registration.answer)
 
     if response.status_code == 200:
@@ -71,14 +66,14 @@ async def cmd_start(msg: Message, state: FSMContext):
 
 
 @router.message(Registration.answer, F.text.casefold() == 'нет')
-async def test_answer(msg: Message, state: FSMContext):
+async def no_reg(msg: Message, state: FSMContext):
     await state.clear()
 
     await msg.answer(f'До свидания, {msg.from_user.first_name}.', reply_markup=ReplyKeyboardRemove())
 
 
 @router.message(Registration.answer, F.text.casefold() == 'да')
-async def test_answer(msg: Message, state: FSMContext):
+async def yes_reg(msg: Message, state: FSMContext):
     await state.clear()
     await state.set_state(Registration.lastname)
 
@@ -86,7 +81,7 @@ async def test_answer(msg: Message, state: FSMContext):
 
 
 @router.message(Registration.lastname)
-async def process_name(msg: Message, state: FSMContext):
+async def reg(msg: Message, state: FSMContext):
     await state.update_data(lastname=msg.text)
     await state.set_state(Registration.firstname)
 
@@ -94,19 +89,19 @@ async def process_name(msg: Message, state: FSMContext):
 
 
 @router.message(Registration.firstname)
-async def process_name(msg: Message, state: FSMContext):
+async def reg(msg: Message, state: FSMContext):
     await state.update_data(firstname=msg.text)
     await state.set_state(Registration.middlename)
 
-    await msg.answer("Введите ваше отчество.",reply_markup=ReplyKeyboardRemove())
+    await msg.answer("Введите ваше отчество.", reply_markup=ReplyKeyboardRemove())
 
 
 @router.message(Registration.middlename)
-async def process_name(msg: Message, state: FSMContext):
+async def reg(msg: Message, state: FSMContext):
     await state.update_data(middlename=msg.text)
     await state.set_state(Registration.university)
 
-    response = requests.get(f'{TEST_URL}/university')
+    response = requests.get(f'{SERVER_URL}/university')
     university_list = []
     for univ in response.json()['results']:
         university_list.append(KeyboardButton(text=f'{univ["name"]}'))
@@ -121,8 +116,8 @@ async def process_name(msg: Message, state: FSMContext):
 
 
 @router.message(Registration.university)
-async def process_name(msg: Message, state: FSMContext):
-    response = requests.get(f'{TEST_URL}/university')
+async def reg(msg: Message, state: FSMContext):
+    response = requests.get(f'{SERVER_URL}/university')
     for univ in response.json()['results']:
         if univ['name'] == msg.text:
             await state.update_data(university=univ['id'])
@@ -132,24 +127,24 @@ async def process_name(msg: Message, state: FSMContext):
 
 
 @router.message(Registration.group)
-async def process_name(msg: Message, state: FSMContext):
+async def reg(msg: Message, state: FSMContext):
     data = await state.update_data(group=msg.text)
     await state.clear()
     #  print(data)
     tg_username = msg.from_user.username
 
-    text = student_reg(firstname=data['firstname'],
-                       lastname=data['lastname'],
-                       middlename=data['middlename'],
-                       university=data['university'],
-                       group=data['group'],
-                       tg_username=tg_username)
+    text = post_reg(firstname=data['firstname'],
+                    lastname=data['lastname'],
+                    middlename=data['middlename'],
+                    university=data['university'],
+                    group=data['group'],
+                    tg_username=tg_username)
     print(text)
     await msg.answer(text=text)
 
 
-def student_reg(firstname: str, lastname: str, middlename: str, university: str, group: str,
-                tg_username: str) -> str:
+def post_reg(firstname: str, lastname: str, middlename: str, university: str, group: str,
+             tg_username: str) -> str:
     new_student = {
         "first_name": firstname,
         "last_name": lastname,
@@ -159,7 +154,7 @@ def student_reg(firstname: str, lastname: str, middlename: str, university: str,
         "tg_username": tg_username,
     }
     print(new_student)
-    response = requests.post(f'{TEST_URL}/student/', json=new_student)
+    response = requests.post(f'{SERVER_URL}/student/', json=new_student)
     print(f'response: {response.status_code}')
     print(f'JSON: {response.json()}')
 
@@ -169,40 +164,13 @@ def student_reg(firstname: str, lastname: str, middlename: str, university: str,
         return 'Ошибка при регистрации!'
 
 
-'''
-@router.message(Command('help'))
-async def cmd_help(msg: Message):
-    #  pass
-    #  await msg.answer(f'Какая помощь Вам нужна, {msg.from_user.first_name}?')
-    with open('test_assessment.json', 'r', encoding='utf-8') as f:
-        text = json.load(f)
-        print(type(text), text)
-        for test in text:
-            print(type(test), test, type(text[test]), text[test], text[test][0], sep='\n')
-        await msg.reply(f'Содержимое .json файла:\n{text["test"][0]["test_name"]}')
-'''
-'''
-@router.message(Command('test'))
-async def cmd_test(msg: Message):
-    test = "deeplink_test"
-    test_link = BOT_URL + f'?start={test}'
-    await msg.reply(f'Пример диплинка:\n{test_link}')
-'''
-
-'''
-@router.message()
-async def get_text_messages(msg: Message):
-    if msg.text.lower() == 'привет':
-        await msg.reply('Привет!')
-    else:
-        await msg.reply('Не понимаю, что это значит.')
-'''
-
-
 async def main():
     bot = Bot(token=TOKEN, parse_mode=ParseMode.HTML)
     dp = Dispatcher()
     dp.include_router(router)
+    link = await create_start_link(bot=bot, payload='test_1', encode=True)
+
+    print(link)
 
     await dp.start_polling(bot)
 
